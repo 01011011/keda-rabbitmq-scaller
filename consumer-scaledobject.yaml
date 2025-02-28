@@ -21,13 +21,13 @@ spec:
         image: mcr.microsoft.com/dotnet/framework/samples:aspnetapp
         env:
         - name: RABBITMQ_HOST
-          value: "13.77.174.243"
+          value: "<VALUE>"
         - name: RABBITMQ_USER
-          value: "nikola"
+          value: "<VALUE>"
         - name: RABBITMQ_PASS
-          value: "P@ssw0rd123!"
+          value: "<VALUE>"
         - name: RABBITMQ_QUEUE
-          value: "test-queue"
+          value: "<VALUE>"
 
 ---
 apiVersion: keda.sh/v1alpha1
@@ -47,7 +47,7 @@ spec:
     metadata:
       queueName: test-queue
       protocol: amqp
-      host: "amqp://nikola:P@ssw0rd123!@13.77.174.243:5672/"
+      host: "<HOST_URL>"
       mode: QueueLength
-      value: "5"
+      value: "<VALUE>"
       # activationValue: "2"  # Optional: uncomment to enable scaling from 0
