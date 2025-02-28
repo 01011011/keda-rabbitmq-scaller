@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: windows-consumer
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: windows-consumer
+  template:
+    metadata:
+      labels:
+        app: windows-consumer
+    spec:
+      # Ensure pods run on Windows nodes
+      nodeSelector:
+        kubernetes.io/os: windows
+      containers:
+      - name: dummy-consumer
+        image: mcr.microsoft.com/dotnet/framework/samples:aspnetapp
+        env:
+        - name: RABBITMQ_HOST
+          value: "13.77.174.243"
+        - name: RABBITMQ_USER
+          value: "nikola"
+        - name: RABBITMQ_PASS
+          value: "P@ssw0rd123!"
+        - name: RABBITMQ_QUEUE
+          value: "test-queue"
+
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: windows-consumer-scaledobject
+  namespace: default
+spec:
+  scaleTargetRef:
+    name: windows-consumer
+  pollingInterval: 5
+  cooldownPeriod: 30
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+  - type: rabbitmq
+    metadata:
+      queueName: test-queue
+      protocol: amqp
+      host: "amqp://nikola:P@ssw0rd123!@13.77.174.243:5672/"
+      mode: QueueLength
+      value: "5"
+      # activationValue: "2"  # Optional: uncomment to enable scaling from 0
